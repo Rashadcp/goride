@@ -9,6 +9,7 @@ interface UserHomeProps {
 
 export default function UserHome({ user, handleLogout }: UserHomeProps) {
     const [isSidebarOpen, setSidebarOpen] = useState(true);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [destination, setDestination] = useState<[number, number] | null>(null);
     const [searchInput, setSearchInput] = useState("");
     const [isSearching, setIsSearching] = useState(false);
@@ -34,20 +35,46 @@ export default function UserHome({ user, handleLogout }: UserHomeProps) {
     };
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] flex font-sans selection:bg-green-100">
-            {/* SIDEBAR */}
-            <aside className={`bg-emerald-950 text-white transition-all duration-500 ease-in-out ${isSidebarOpen ? "w-72" : "w-20"} hidden md:flex flex-col p-6 relative overflow-hidden`}>
-                {/* Background Decor */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 blur-[80px] rounded-full -translate-y-1/2 translate-x-1/2"></div>
+        <div className="h-screen bg-[#F8FAFC] flex font-sans selection:bg-green-100 overflow-hidden">
+            {/* MOBILE OVERLAY */}
+            {isMobileMenuOpen && (
+                <div
+                    className="fixed inset-0 bg-emerald-950/60 backdrop-blur-sm z-[60] md:hidden"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                ></div>
+            )}
 
-                {/* Logo */}
-                <div className="flex items-center gap-3 mb-12 relative z-10 transition-all">
-                    <div className="w-10 h-10 bg-[#00FF85] rounded-xl flex items-center justify-center shadow-lg shadow-[#00FF85]/20 shrink-0">
-                        <svg className="w-6 h-6 text-emerald-950" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z" />
-                        </svg>
+            {/* SIDEBAR */}
+            <aside className={`
+                bg-emerald-950 text-white transition-all duration-500 ease-in-out 
+                ${isSidebarOpen ? "w-72 p-6" : "w-20 p-4"} 
+                fixed inset-y-0 left-0 z-[70] 
+                md:sticky md:top-0 md:h-screen
+                ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+                flex flex-col overflow-y-auto overflow-x-hidden shrink-0 border-r border-white/5
+            `}>
+                {/* Background Decor */}
+                {isSidebarOpen && <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 blur-[80px] rounded-full -translate-y-1/2 translate-x-1/2"></div>}
+                {isSidebarOpen && <div className="absolute bottom-40 left-0 w-20 h-20 bg-[#00FF85]/5 blur-[40px] rounded-full translate-y-1/2 -translate-x-1/2"></div>}
+
+                {/* Logo & Close Button */}
+                <div className={`flex items-center ${isSidebarOpen ? "justify-between" : "justify-center"} mb-10 relative z-10 transition-all`}>
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-[#00FF85] rounded-xl flex items-center justify-center shadow-lg shadow-[#00FF85]/20 shrink-0">
+                            <svg className="w-6 h-6 text-emerald-950" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z" />
+                            </svg>
+                        </div>
+                        {isSidebarOpen && <span className="font-bold text-xl tracking-tight">GoRide</span>}
                     </div>
-                    {isSidebarOpen && <span className="font-bold text-xl tracking-tight">GoRide</span>}
+
+                    {/* Mobile Close Button */}
+                    <button
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="md:hidden p-2 hover:bg-white/10 rounded-xl transition-colors"
+                    >
+                        <span className="text-xl">✕</span>
+                    </button>
                 </div>
 
                 {/* Navigation */}
@@ -61,12 +88,12 @@ export default function UserHome({ user, handleLogout }: UserHomeProps) {
                     ].map((item) => (
                         <button
                             key={item.label}
-                            className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group ${item.active
+                            className={`w-full flex items-center ${isSidebarOpen ? "gap-4 px-4" : "justify-center px-0 h-12 w-12 mx-auto"} py-3.5 rounded-2xl transition-all group ${item.active
                                 ? "bg-[#00FF85] text-emerald-950 font-bold shadow-lg shadow-[#00FF85]/20"
                                 : "hover:bg-white/5 text-emerald-100/60 hover:text-white"
                                 }`}
                         >
-                            <span className={`text-xl ${item.active ? "" : "grayscale group-hover:grayscale-0"} transition-all`}>{item.icon}</span>
+                            <span className={`text-xl ${isSidebarOpen ? "" : "text-2xl"} ${item.active ? "" : "grayscale group-hover:grayscale-0"} transition-all shrink-0`}>{item.icon}</span>
                             {isSidebarOpen && (
                                 <div className="flex-1 flex items-center justify-between">
                                     <span className="text-sm tracking-wide">{item.label}</span>
@@ -83,8 +110,8 @@ export default function UserHome({ user, handleLogout }: UserHomeProps) {
 
                 {/* User Profile Area */}
                 <div className="pt-6 border-t border-white/10 relative z-10">
-                    <div className="flex items-center gap-3 p-2 bg-white/5 rounded-2xl">
-                        <div className="w-10 h-10 rounded-xl overflow-hidden bg-emerald-800 border-2 border-green-500/30">
+                    <div className={`flex items-center ${isSidebarOpen ? "gap-3 p-2" : "justify-center p-1.5 w-12 h-12 mx-auto"} bg-white/5 rounded-2xl`}>
+                        <div className="w-9 h-9 rounded-xl overflow-hidden bg-emerald-800 border-2 border-green-500/30 shrink-0">
                             {user?.profilePhoto ? (
                                 <img src={user.profilePhoto} alt="User" className="w-full h-full object-cover" />
                             ) : (
@@ -115,17 +142,24 @@ export default function UserHome({ user, handleLogout }: UserHomeProps) {
                 {/* Sidebar Toggle */}
                 <button
                     onClick={() => setSidebarOpen(!isSidebarOpen)}
-                    className="absolute -right-3 top-24 bg-[#00FF85] text-emerald-950 w-6 h-12 rounded-full flex items-center justify-center shadow-lg border border-white/20 z-50 hover:scale-110 active:scale-95 transition-all"
+                    className={`absolute ${isSidebarOpen ? "-right-3" : "-right-3"} top-24 bg-[#00FF85] text-emerald-950 w-6 h-12 rounded-full flex items-center justify-center shadow-lg border border-white/20 z-50 hover:scale-110 active:scale-95 transition-all hidden md:flex`}
                 >
                     <span className="text-[10px]">{isSidebarOpen ? "◀" : "▶"}</span>
                 </button>
             </aside>
 
             {/* MAIN CONTENT */}
-            <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+            <main className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
                 {/* TOP BAR */}
                 <header className="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-6 lg:px-10 shrink-0">
                     <div className="flex items-center gap-4 flex-1 max-w-xl">
+                        {/* Mobile Toggle */}
+                        <button
+                            onClick={() => setIsMobileMenuOpen(true)}
+                            className="md:hidden w-10 h-10 flex items-center justify-center bg-gray-50 rounded-xl"
+                        >
+                            <span className="text-xl">☰</span>
+                        </button>
                         <form onSubmit={handleSearch} className="relative w-full group">
                             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-green-500 transition-colors">
                                 {isSearching ? "⏳" : "🔍"}
